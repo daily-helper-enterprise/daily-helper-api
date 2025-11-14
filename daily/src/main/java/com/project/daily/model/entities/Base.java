@@ -1,11 +1,15 @@
-package com.project.daily.model;
+package com.project.daily.model.entities;
 
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,7 +17,9 @@ import java.util.UUID;
 @Setter
 @MappedSuperclass
 @EqualsAndHashCode(of = "uuid")
-@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@SuperBuilder
 public abstract class Base {
 
     @Id
@@ -35,5 +41,10 @@ public abstract class Base {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    @PrePersist
+    public void PrePersist() {
+        this.createdAt = LocalDateTime.now();
     }
 }

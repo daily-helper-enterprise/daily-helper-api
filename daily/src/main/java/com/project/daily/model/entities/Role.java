@@ -1,4 +1,4 @@
-package com.project.daily.model;
+package com.project.daily.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class Role extends Base {
 
     @Column(name = "name", nullable = false)

@@ -1,4 +1,4 @@
-package com.project.daily.model;
+package com.project.daily.model.entities;
 
 import java.util.HashSet;
 import java.util.Set;

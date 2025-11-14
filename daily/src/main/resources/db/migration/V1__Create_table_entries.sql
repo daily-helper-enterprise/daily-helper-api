@@ -2,7 +2,7 @@ CREATE TABLE entries (
     id BIGSERIAL PRIMARY KEY,
     uuid UUID NOT NULL,
     removed_at TIMESTAMP NULL,
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     member_id BIGINT NULL,
     type VARCHAR(50) NOT NULL,
