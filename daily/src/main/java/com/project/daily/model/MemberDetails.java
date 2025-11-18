@@ -21,6 +21,10 @@ public class MemberDetails implements UserDetails {
         return List.of(new SimpleGrantedAuthority("ROLE_" + roleName));
     }
 
+    public Member getMember() {
+        return this.member;
+    }
+
     @Override public String getPassword() { return member.getPassword(); }
     @Override public String getUsername() { return member.getUsername(); }
     @Override public boolean isAccountNonExpired() { return true; }

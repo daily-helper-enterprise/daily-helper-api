@@ -41,7 +41,7 @@ public class Member extends Base {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 

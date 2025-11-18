@@ -9,7 +9,7 @@ import com.project.daily.model.request.RegisterRequest;
 import com.project.daily.services.AuthService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
 

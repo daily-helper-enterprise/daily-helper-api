@@ -5,10 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.daily.builders.MemberBuilder;
+import com.project.daily.model.MemberDetails;
 import com.project.daily.model.entities.Member;
 import com.project.daily.model.entities.Role;
 import com.project.daily.model.request.LoginRequest;
@@ -44,6 +46,16 @@ public class AuthService {
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(401).body("Credenciais inválidas");
         }
+    }
+
+    public Member getLoggedUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof MemberDetails memberDetails) {
+            return memberDetails.getMember();
+        }
+
+        return null;
     }
 
     public Member register(RegisterRequest request) {

@@ -2,8 +2,10 @@ package com.project.daily.model.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import com.project.daily.enums.EntryTypeEnum;
 
@@ -12,7 +14,9 @@ import com.project.daily.enums.EntryTypeEnum;
 @Table(name = "entries")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
+@Getter
+@Setter
 public class Entry extends Base {
 
     @ManyToOne
