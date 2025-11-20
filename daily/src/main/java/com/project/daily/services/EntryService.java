@@ -32,8 +32,10 @@ public class EntryService {
         return toResponse(entry);
     }
 
-    public List<EntryResponse> findAll() {
-        return entryRepository.findAll().stream()
+
+    public List<EntryResponse> findToday() {
+        var loggedUser = authService.getLoggedUser();
+        return entryRepository.findAllByMemberIdAndCreatedToday(loggedUser.getId()).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }

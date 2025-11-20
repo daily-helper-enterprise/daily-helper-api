@@ -28,9 +28,9 @@ public class EntryController {
         this.entryService = entryService;
     }
 
-    @GetMapping
-    public List<EntryResponse> getAll() {
-        return entryService.findAll();
+    @GetMapping("/today")
+    public List<EntryResponse> getToday() {
+        return entryService.findToday();
     }
 
     @GetMapping("/{id}")
