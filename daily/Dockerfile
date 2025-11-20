@@ -1,6 +1,6 @@
 FROM maven:3.9-amazoncorretto-17 AS build
 WORKDIR /app
-COPY . .
+COPY daily/ .
 RUN mvn clean package -DskipTests
 
 FROM amazoncorretto:17
