@@ -1,15 +1,12 @@
 package com.project.daily.model.request;
 
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+@Data
 public class UpdateEntryRequest {
-    
-    private boolean resolved;
 
-    public boolean isResolved() {
-        return resolved;
-    }
-
-    public void setResolved(boolean resolved) {
-        this.resolved = resolved;
-    }
-    
+    // Status de resolução do impedimento (US08)
+    @NotNull(message = "O status de resolução é obrigatório.")
+    private Boolean impedimentResolved;
 }

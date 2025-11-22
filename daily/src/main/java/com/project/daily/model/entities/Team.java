@@ -30,9 +30,11 @@ public class Team extends Base {
     )
     private Set<Member> members = new HashSet<>();
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scrum_master_id", referencedColumnName = "id")
     @ToString.Exclude
     private Member scrumMaster;
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Sprint> sprints = new HashSet<>();
 }

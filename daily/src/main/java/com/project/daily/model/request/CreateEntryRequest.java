@@ -1,14 +1,23 @@
 package com.project.daily.model.request;
 
-
-import com.project.daily.enums.EntryTypeEnum;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
-@Getter
 public class CreateEntryRequest {
-    private EntryTypeEnum type;
-    private String description;
-}
 
+    // O que fiz ontem (US01)
+    @NotBlank(message = "O campo 'Ontem' é obrigatório.")
+    private String yesterday;
+
+    // O que farei hoje (US01)
+    @NotBlank(message = "O campo 'Hoje' é obrigatório.")
+    private String today;
+
+    /*
+     * Impedimentos registrados (US01).
+     */
+    @NotNull(message = "O campo 'Impedimentos' é obrigatório.")
+    private String impediments;
+}

@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import com.project.daily.enums.EntryTypeEnum;
-
+// Removida importação de EntryTypeEnum pois Entry agora é a submissão completa.
 
 @Entity
 @Table(name = "entries")
@@ -17,19 +16,37 @@ import com.project.daily.enums.EntryTypeEnum;
 @SuperBuilder
 @Getter
 @Setter
+@AttributeOverride(name = "id", column = @Column(name = "entry_id")) // Exemplo para clareza
 public class Entry extends Base {
 
+    // Ligação com o membro que fez a submissão
     @ManyToOne
-    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    @JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false)
     private Member member;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    private EntryTypeEnum type;
+    // Ligação com a Daily (o container de data)
+    @ManyToOne
+    @JoinColumn(name = "daily_id", referencedColumnName = "id", nullable = false)
+    private Daily daily;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    // ----------------------------------------------------
+    // Campos obrigatórios do formulário Daily (US01)
+    // ----------------------------------------------------
 
-    @Column(nullable = false)
-    private boolean resolved;
+    @Column(name = "what_i_did_yesterday", columnDefinition = "TEXT", nullable = false)
+    private String yesterday;
+
+    @Column(name = "what_i_will_do_today", columnDefinition = "TEXT", nullable = false)
+    private String today;
+
+    // Impedimentos registrados. Pode ser uma string vazia se não houver impedimentos.
+    @Column(name = "impediments", columnDefinition = "TEXT", nullable = false)
+    private String impediments;
+
+    // Campo de controle para o limite de edição (US03)
+    @Column(name = "is_editable")
+    private boolean editable = true; // Controlado por lógica de horário limite
+
+    @Column(name = "impediment_resolved")
+    private boolean impedimentResolved;
 }
