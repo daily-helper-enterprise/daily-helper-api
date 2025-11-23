@@ -35,4 +35,8 @@ public class Team extends Base {
     @JoinColumn(name = "scrum_master_id", referencedColumnName = "id")
     @ToString.Exclude
     private Member scrumMaster;
+
+    // NOVO: Relacionamento com Sprint
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Sprint> sprints = new HashSet<>();
 }
