@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.daily.model.request.CreateEntryRequest;
 import com.project.daily.model.request.UpdateEntryRequest;
@@ -21,7 +22,7 @@ import com.project.daily.services.EntryService;
 @RestController
 @RequestMapping("/entries")
 public class EntryController {
-    
+
     private final EntryService entryService;
 
     public EntryController(EntryService entryService) {
@@ -38,23 +39,39 @@ public class EntryController {
         return entryService.findById(id);
     }
 
-    @PostMapping
-    public ResponseEntity<EntryResponse> create(@RequestBody CreateEntryRequest request) {
-        EntryResponse entry = entryService.create(request);
+    /**
+     * Rota de Criação: Agora exige o teamId na URL, pois a Daily (e seu prazo)
+     * são definidos pelo contexto do time selecionado.
+     * Endpoint: POST /entries/team/{teamId}
+     */
+    @PostMapping("/team/{teamId}")
+    public ResponseEntity<EntryResponse> create(
+            @PathVariable Long teamId, // NOVO: Captura o teamId da URL
+            @RequestBody CreateEntryRequest request) {
+
+        // Chama o serviço passando o teamId
+        EntryResponse entry = entryService.create(request, teamId);
         return ResponseEntity.status(HttpStatus.CREATED).body(entry);
     }
 
-    @PutMapping("/{id}")
+    /**
+     * Rota de Atualização: Exige teamId na URL para verificação do prazo (DailyService.isEditAllowed).
+     * Endpoint: PUT /entries/{id}/team/{teamId}
+     */
+    @PutMapping("/{id}/team/{teamId}")
     public ResponseEntity<EntryResponse> update(
             @PathVariable Long id,
+            @PathVariable Long teamId, // NOVO: Captura o teamId da URL
             @RequestBody UpdateEntryRequest request) {
 
-        EntryResponse entry = entryService.update(id, request);
+        // Chama o serviço passando o teamId
+        EntryResponse entry = entryService.update(id, request, teamId);
         return ResponseEntity.ok(entry);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        // A deleção lógica não depende do prazo do time.
         entryService.delete(id);  // deleção lógica
         return ResponseEntity.noContent().build();
     }

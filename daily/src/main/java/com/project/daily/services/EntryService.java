@@ -1,12 +1,12 @@
 package com.project.daily.services;
 
-
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.daily.model.entities.Entry;
 import com.project.daily.model.entities.Member;
@@ -17,13 +17,16 @@ import com.project.daily.repositories.EntryRepository;
 
 @Service
 public class EntryService {
-    
+
     private final EntryRepository entryRepository;
     private final AuthService authService;
+    private final DailyService dailyService; // NOVO: Injeção do DailyService
 
-    public EntryService(EntryRepository entryRepository, AuthService authService) {
+    // Construtor atualizado para incluir DailyService
+    public EntryService(EntryRepository entryRepository, AuthService authService, DailyService dailyService) {
         this.entryRepository = entryRepository;
         this.authService = authService;
+        this.dailyService = dailyService;
     }
 
     public EntryResponse findById(Long id) {
@@ -40,7 +43,18 @@ public class EntryService {
                 .collect(Collectors.toList());
     }
 
-    public EntryResponse create(CreateEntryRequest request) {
+    /**
+     * Cria uma nova Entry, exigindo o ID da equipe selecionada.
+     * @param request Dados da Entry.
+     * @param teamId ID da equipe ativa do usuário (vindo do frontend).
+     */
+    @Transactional
+    public EntryResponse create(CreateEntryRequest request, Long teamId) {
+        // VERIFICAÇÃO DE PRAZO: Usa DailyService com o teamId
+        if (!dailyService.isSubmissionAllowed(LocalDate.now(), teamId)) {
+            throw new RuntimeException("Submissão negada: O prazo da Daily Meeting para o time selecionado já se encerrou.");
+        }
+
         Entry entry = new Entry();
 
         entry.setDescription(request.getDescription());
@@ -53,7 +67,19 @@ public class EntryService {
         return toResponse(saved);
     }
 
-    public EntryResponse update(Long id, UpdateEntryRequest request) {
+    /**
+     * Atualiza uma Entry existente, exigindo o ID da equipe selecionada.
+     * @param id ID da Entry a ser atualizada.
+     * @param request Dados de atualização.
+     * @param teamId ID da equipe ativa do usuário (vindo do frontend).
+     */
+    @Transactional
+    public EntryResponse update(Long id, UpdateEntryRequest request, Long teamId) {
+        // VERIFICAÇÃO DE PRAZO (US03): Usa DailyService com o teamId
+        if (!dailyService.isEditAllowed(id, teamId)) {
+            throw new RuntimeException("Edição negada: O prazo para atualização desta Entry já se encerrou.");
+        }
+
         Entry entry = entryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entry not found"));
 
@@ -64,6 +90,7 @@ public class EntryService {
         return toResponse(updated);
     }
 
+    @Transactional
     public void delete(Long id) {
         Entry entry = entryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entry not found"));
@@ -83,5 +110,4 @@ public class EntryService {
                 .resolved(entry.isResolved())
                 .build();
     }
-
 }
