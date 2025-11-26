@@ -43,11 +43,11 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
           )
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((req, res, e) -> res.sendError(401))
-                .accessDeniedHandler((req, res, e) -> res.sendError(403))
-        );
+            .authenticationEntryPoint((req, res, e) -> res.sendError(401, "Unauthorized"))
+            .accessDeniedHandler((req, res, e) -> res.sendError(403, "Forbidden"))
+        )
+        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }

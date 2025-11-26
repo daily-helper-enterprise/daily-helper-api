@@ -1,5 +1,6 @@
 package com.project.daily.controller;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegisterRequest request) {
+    public ResponseEntity register(@RequestBody RegisterRequest request) throws BadRequestException {
         authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
