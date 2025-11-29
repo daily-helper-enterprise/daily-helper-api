@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.project.daily.exception.EntityNotFoundException;
+import com.project.daily.message.LogMessageEnum;
 import com.project.daily.model.entities.Entry;
 import com.project.daily.model.entities.Member;
 import com.project.daily.model.request.CreateEntryRequest;
@@ -26,9 +28,13 @@ public class EntryService {
         this.authService = authService;
     }
 
+    private Entry findOrThrow(Long id) {
+        return entryRepository.findByIdAndRemovedAtIsNull(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(LogMessageEnum.ENTRY_NOT_FOUND.getMessage(), id.toString(0))));
+    }
+
     public EntryResponse findById(Long id) {
-        Entry entry = entryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entry not found"));
+        Entry entry = findOrThrow(id);
         return toResponse(entry);
     }
 
@@ -54,8 +60,7 @@ public class EntryService {
     }
 
     public EntryResponse update(Long id, UpdateEntryRequest request) {
-        Entry entry = entryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entry not found"));
+        Entry entry = findOrThrow(id);
 
         entry.setResolved(request.isResolved());
 
@@ -65,8 +70,7 @@ public class EntryService {
     }
 
     public void delete(Long id) {
-        Entry entry = entryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entry not found"));
+        Entry entry = findOrThrow(id);
 
         entry.setRemovedAt(LocalDateTime.now());
         entryRepository.save(entry);
