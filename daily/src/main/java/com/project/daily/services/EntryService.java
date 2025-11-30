@@ -58,6 +58,7 @@ public class EntryService {
                 .orElseThrow(() -> new RuntimeException("Entry not found"));
 
         entry.setResolved(request.isResolved());
+        entry.setUpdatedAt(LocalDateTime.now());
 
         Entry updated = entryRepository.save(entry);
 
