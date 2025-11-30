@@ -63,6 +63,7 @@ public class EntryService {
         Entry entry = findOrThrow(id);
 
         entry.setResolved(request.isResolved());
+        entry.setUpdatedAt(LocalDateTime.now());
 
         Entry updated = entryRepository.save(entry);
 
