@@ -28,6 +28,7 @@ public class Team extends Base {
             joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "member_id", referencedColumnName = "id")
     )
+    @ToString.Exclude
     private Set<Member> members = new HashSet<>();
 
 

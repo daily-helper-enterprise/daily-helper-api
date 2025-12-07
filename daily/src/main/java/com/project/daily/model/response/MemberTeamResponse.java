@@ -1,6 +1,6 @@
 package com.project.daily.model.response;
 
-import java.util.List;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class TeamResponse {
-
+public class MemberTeamResponse {
     private Long id;
     private String name;
     private String description;
-    private String scrumMaster;
-    private List<String> members;
+    private boolean scrumMaster;
 }

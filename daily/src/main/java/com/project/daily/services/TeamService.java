@@ -1,6 +1,7 @@
 package com.project.daily.services;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -37,26 +38,16 @@ public class TeamService {
     }
 
     public TeamResponse create(TeamRequest req) {
-
         Member creator = authService.getLoggedUser();
         if (creator == null) {
             throw new RuntimeException("Member not logged in");
         }
-
         Team team = Team.builder()
                 .name(req.getName())
                 .description(req.getDescription())
                 .scrumMaster(creator)
                 .build();
-
-        if (req.getMembersIds() != null) {
-            List<Member> members = memberRepository.findAllById(req.getMembersIds());
-            team.getMembers().addAll(members); 
-        }
-
-        // Adiciona o criador como membro da equipe
-        team.getMembers().add(creator);
-
+        team.setMembers(Set.of(creator));
         teamRepository.save(team);
         return toResponse(team);
     }

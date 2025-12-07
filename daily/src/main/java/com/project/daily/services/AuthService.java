@@ -23,6 +23,7 @@ import com.project.daily.model.entities.Role;
 import com.project.daily.model.request.LoginRequest;
 import com.project.daily.model.request.RegisterRequest;
 import com.project.daily.model.response.JwtResponse;
+import com.project.daily.model.response.MemberResponse;
 import com.project.daily.repositories.MemberRepository;
 import com.project.daily.repositories.RoleRepository;
 import com.project.daily.utils.JwtUtil;
@@ -57,13 +58,25 @@ public class AuthService {
         }
     }
 
+    public MemberResponse getLoggedUserResponse() {
+        Member member = getLoggedUser();
+        if (member == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
+        }
+
+        return MemberResponse.builder()
+                .id(member.getId())
+                .name(member.getName())
+                .email(member.getEmail())
+                .username(member.getUsername())
+                .build();
+    }
+
     public Member getLoggedUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         if (principal instanceof MemberDetails memberDetails) {
             return memberDetails.getMember();
         }
-
         return null;
     }
 

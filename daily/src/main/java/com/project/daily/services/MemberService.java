@@ -1,14 +1,19 @@
 package com.project.daily.services;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.project.daily.model.entities.Member;
 import com.project.daily.model.entities.Role;
+import com.project.daily.model.entities.Team;
 import com.project.daily.model.request.RegisterRequest;
 import com.project.daily.model.response.MemberResponse;
+import com.project.daily.model.response.MemberTeamResponse;
 import com.project.daily.repositories.MemberRepository;
 import com.project.daily.repositories.RoleRepository;
 
@@ -66,6 +71,32 @@ public class MemberService {
                 .name(m.getName())
                 .email(m.getEmail())
                 .username(m.getUsername())
+                .teams(teamToResponse(m.getTeams(), m.getTeamsAsScrumMaster()))
                 .build();
     }
+
+    private List<MemberTeamResponse> teamToResponse(Set<Team> teams, Set<Team> teamsAsScrumMaster) {
+
+        Set<Team> allTeams = new HashSet<>();
+        allTeams.addAll(teams);
+        allTeams.addAll(teamsAsScrumMaster);
+
+        List<MemberTeamResponse> response = new ArrayList<>();
+        for (Team team : allTeams) {
+
+            boolean isScrumMaster = teamsAsScrumMaster.contains(team);
+
+            response.add(MemberTeamResponse.builder()
+                    .id(team.getId())
+                    .name(team.getName())
+                    .description(team.getDescription())
+                    .scrumMaster(isScrumMaster)
+                    .build());
+        }
+
+        return response;
+    }
+
+
+
 }

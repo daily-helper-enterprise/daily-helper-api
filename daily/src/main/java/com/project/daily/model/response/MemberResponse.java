@@ -1,5 +1,7 @@
 package com.project.daily.model.response;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +16,5 @@ public class MemberResponse {
     private String name;
     private String email;
     private String username;
-    //private String role; Analisar como tratar isso
-    //private String ip; Analisar como tratar isso
+    private List<MemberTeamResponse> teams;
 }

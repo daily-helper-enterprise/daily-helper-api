@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.project.daily.model.request.RegisterRequest;
 import com.project.daily.model.response.MemberResponse;
+import com.project.daily.services.AuthService;
 import com.project.daily.services.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,10 +19,18 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 
     private final MemberService memberService;
+    private final AuthService authService;
 
     @GetMapping
     public List<MemberResponse> getAll() {
         return memberService.findAll();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getLoggedUser() {
+        var auth = authService.getLoggedUserResponse();
+        var members = memberService.findById(auth.getId());
+        return ResponseEntity.ok(members);
     }
 
     @GetMapping("/{id}")
