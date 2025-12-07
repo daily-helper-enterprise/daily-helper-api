@@ -36,7 +36,6 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // --- UPDATE NAME ---
     @PatchMapping("/{id}/name")
     public TeamResponse updateName(
             @PathVariable Long id,
@@ -45,7 +44,6 @@ public class TeamController {
         return teamService.updateName(id, body.get("name"));
     }
 
-    // --- UPDATE DESCRIPTION ---
     @PatchMapping("/{id}/description")
     public TeamResponse updateDescription(
             @PathVariable Long id,
@@ -54,7 +52,6 @@ public class TeamController {
         return teamService.updateDescription(id, body.get("description"));
     }
 
-    // --- TRANSFER SCRUM MASTER ---
     @PatchMapping("/{id}/scrum-master/{newScrumMasterId}")
     public TeamResponse transferScrumMaster(
             @PathVariable Long id,
@@ -63,14 +60,12 @@ public class TeamController {
         return teamService.transferScrumMaster(id, newScrumMasterId);
     }
 
-    // REMOVE TEAM
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         teamService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // ADD MEMBER
     @PostMapping("/{teamId}/members/{memberId}")
     public TeamResponse addMember(
             @PathVariable Long teamId,
@@ -79,7 +74,6 @@ public class TeamController {
         return teamService.addMember(teamId, memberId);
     }
 
-    // REMOVE MEMBER
     @DeleteMapping("/{teamId}/members/{memberId}")
     public TeamResponse removeMember(
             @PathVariable Long teamId,
