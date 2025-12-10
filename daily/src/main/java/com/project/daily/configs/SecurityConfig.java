@@ -1,6 +1,8 @@
 package com.project.daily.configs;
 
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,6 +10,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.project.daily.security.JwtAuthenticationFilter;
 import com.project.daily.services.MemberDetailsService;
@@ -31,6 +36,22 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtUtil, memberDetailsService);
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of("*"));        // libera todas as origens
+        config.setAllowedMethods(List.of("*"));        // libera todos os métodos (GET, POST...)
+        config.setAllowedHeaders(List.of("*"));        // libera todos os headers
+        config.setExposedHeaders(List.of("*"));        // (opcional) expõe todos os headers
+        config.setAllowCredentials(false);             // obrigatório ser false quando origem = "*"
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 
     @Bean

@@ -9,7 +9,10 @@ import lombok.Data;
 public class EntryResponse {
     private Long id;
     private Long memberId;
+    private String memberName;
     private EntryTypeEnum type;
+    private String title;
     private String description;
     private boolean resolved;
+    private String creationDate;
 }

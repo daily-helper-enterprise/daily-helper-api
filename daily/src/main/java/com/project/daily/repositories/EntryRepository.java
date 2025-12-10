@@ -1,5 +1,6 @@
 package com.project.daily.repositories;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,12 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
     List<Entry> findAllByMemberIdAndCreatedToday(@Param("id") Long id);
 
     Optional<Entry> findByIdAndRemovedAtIsNull(Long id);
+
+    List<Entry> findAllByMemberIdAndCreatedAtBetweenAndRemovedAtIsNull(
+        Long memberId,
+        LocalDateTime startDate,
+        LocalDateTime endDate
+    );
 
 
 

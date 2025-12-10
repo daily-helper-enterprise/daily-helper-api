@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.project.daily.model.request.DateRangeRequest;
 import com.project.daily.model.request.TeamRequest;
+import com.project.daily.model.response.EntryResponse;
 import com.project.daily.model.response.TeamResponse;
 import com.project.daily.services.TeamService;
 
@@ -28,6 +30,19 @@ public class TeamController {
     @GetMapping("/{id}")
     public TeamResponse getById(@PathVariable Long id) {
         return teamService.findById(id);
+    }
+
+    @PostMapping("/{teamId}/entries")
+    public ResponseEntity<List<EntryResponse>> getMembersEntriesInRange(
+            @PathVariable Long teamId,
+            @RequestBody DateRangeRequest request
+    ) {
+        List<EntryResponse> entries = teamService.getMembersAndEntries(
+                teamId,
+                request.getStartDate(),
+                request.getEndDate()
+        );
+        return ResponseEntity.ok(entries);
     }
 
     @PostMapping

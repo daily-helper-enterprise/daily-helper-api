@@ -28,6 +28,9 @@ public class Entry extends Base {
     private EntryTypeEnum type;
 
     @Column(columnDefinition = "TEXT")
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)

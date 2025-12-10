@@ -14,5 +14,5 @@ public class TeamResponse {
     private String name;
     private String description;
     private String scrumMaster;
-    private List<String> members;
+    private List<TeamMembersResponse> members;
 }

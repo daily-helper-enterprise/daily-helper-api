@@ -3,7 +3,9 @@ package com.project.daily.services;
 
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -22,20 +24,68 @@ public class EntryService {
     
     private final EntryRepository entryRepository;
     private final AuthService authService;
+    private final LlamaClientService llamaClientService;
 
-    public EntryService(EntryRepository entryRepository, AuthService authService) {
+    public EntryService(EntryRepository entryRepository, AuthService authService, LlamaClientService llamaClientService) {
         this.entryRepository = entryRepository;
         this.authService = authService;
+        this.llamaClientService = llamaClientService;
     }
 
     private Entry findOrThrow(Long id) {
         return entryRepository.findByIdAndRemovedAtIsNull(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(LogMessageEnum.ENTRY_NOT_FOUND.getMessage(), id.toString(0))));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(LogMessageEnum.ENTRY_NOT_FOUND.getMessage(), id.toString())));
     }
 
     public EntryResponse findById(Long id) {
         Entry entry = findOrThrow(id);
         return toResponse(entry);
+    }
+
+    public List<EntryResponse> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        var loggedUser = authService.getLoggedUser();
+
+            List<Entry> entries = entryRepository.findAllByMemberIdAndCreatedAtBetweenAndRemovedAtIsNull(
+                    loggedUser.getId(),
+                    startDate,
+                    endDate
+            );
+
+            return entries.stream()
+                    .map(this::toResponse)
+                    .collect(Collectors.toList());
+        }
+
+        public String generateDailySummary() {
+        var loggedUser = authService.getLoggedUser();
+
+        var entries = entryRepository
+                .findAllByMemberIdAndCreatedToday(loggedUser.getId())
+                .stream()
+                .map(this::toResponse)
+                .toList();
+
+        if (entries.isEmpty()) {
+            return "Nenhuma daily encontrada para hoje.";
+        }
+
+        // Montar texto para a IA
+        StringBuilder builder = new StringBuilder("Aqui estão as dailies de hoje. Gere um resumo focando em impedimentos:\n\n");
+
+        for (EntryResponse e : entries) {
+            builder.append("- ")
+                    .append("[").append(e.getMemberName()).append("] ")
+                    .append(e.getDescription());
+
+            if (e.isResolved()) {
+                builder.append(" (resolvido)");
+            }
+
+            builder.append("\n");
+        }
+
+        // Chamar a IA
+        return llamaClientService.summarizeDaily(builder.toString());
     }
 
 
@@ -51,6 +101,7 @@ public class EntryService {
 
         entry.setDescription(request.getDescription());
         entry.setResolved(false);
+        entry.setTitle(request.getTitle());
         entry.setType(request.getType());
         entry.setCreatedAt(LocalDateTime.now());
         Member loggedUser = authService.getLoggedUser();
@@ -63,6 +114,8 @@ public class EntryService {
         Entry entry = findOrThrow(id);
 
         entry.setResolved(request.isResolved());
+        Optional.ofNullable(request.getTitle()).ifPresent((t) -> entry.setTitle(t));
+        Optional.ofNullable(request.getDescription()).ifPresent(d -> entry.setDescription(d));
         entry.setUpdatedAt(LocalDateTime.now());
 
         Entry updated = entryRepository.save(entry);
@@ -79,13 +132,17 @@ public class EntryService {
 
 
 
-    private EntryResponse toResponse(Entry entry) {
+    public EntryResponse toResponse(Entry entry) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         return EntryResponse.builder()
                 .id(entry.getId())
                 .memberId(entry.getMember().getId())
+                .memberName(entry.getMember().getName())
                 .type(entry.getType())
+                .title(entry.getTitle())
                 .description(entry.getDescription())
                 .resolved(entry.isResolved())
+                .creationDate(entry.getCreatedAt().format(formatter))
                 .build();
     }
 

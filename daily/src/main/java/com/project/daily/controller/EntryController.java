@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.daily.model.request.CreateEntryRequest;
+import com.project.daily.model.request.DateRangeRequest;
 import com.project.daily.model.request.UpdateEntryRequest;
 import com.project.daily.model.response.EntryResponse;
 import com.project.daily.services.EntryService;
@@ -33,9 +34,19 @@ public class EntryController {
         return entryService.findToday();
     }
 
+    @PostMapping("/range")
+    public List<EntryResponse> findByDateRange(@RequestBody DateRangeRequest request) {
+        return entryService.findByDateRange(request.getStartDate(), request.getEndDate());
+    }
+
     @GetMapping("/{id}")
     public EntryResponse getById(@PathVariable Long id) {
         return entryService.findById(id);
+    }
+
+    @GetMapping("/today/abstract")
+    public ResponseEntity<String> getDailyResumo() {
+        return ResponseEntity.ok(entryService.generateDailySummary());
     }
 
     @PostMapping

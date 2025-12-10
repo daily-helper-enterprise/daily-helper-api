@@ -6,6 +6,7 @@ CREATE TABLE entries (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     member_id BIGINT NULL,
     type VARCHAR(50) NOT NULL,
+    title TEXT,
     description TEXT,
     resolved BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_entries_member

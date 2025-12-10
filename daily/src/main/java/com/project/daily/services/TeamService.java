@@ -1,5 +1,6 @@
 package com.project.daily.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.project.daily.model.entities.Team;
 import com.project.daily.model.entities.Member;
 import com.project.daily.model.request.TeamRequest;
+import com.project.daily.model.response.EntryResponse;
+import com.project.daily.model.response.TeamMembersResponse;
 import com.project.daily.model.response.TeamResponse;
 import com.project.daily.repositories.TeamRepository;
 import com.project.daily.repositories.MemberRepository;
@@ -22,12 +25,30 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
+    private final EntryService entryService;
     private final AuthService authService;
 
     public List<TeamResponse> findAll() {
         return teamRepository.findAll()
                 .stream()
                 .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<EntryResponse> getMembersAndEntries(Long teamId, LocalDateTime startDate, LocalDateTime endDate) {
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new EntityNotFoundException("Team not found: " + teamId));
+
+        return team.getMembers()
+                .stream()
+                .flatMap(member -> member.getEntries().stream())
+                .filter(entry ->
+                        entry.getRemovedAt() == null &&
+                        (entry.getCreatedAt().isAfter(startDate) || entry.getCreatedAt().isEqual(startDate)) &&
+                        (entry.getCreatedAt().isBefore(endDate) || entry.getCreatedAt().isEqual(endDate))
+                )
+                .map(entryService::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -131,7 +152,12 @@ public class TeamService {
                         : null)
                 .members(team.getMembers()
                         .stream()
-                        .map(Member::getName)
+                        .map((member) -> {
+                                return TeamMembersResponse.builder()
+                                .name(member.getName())
+                                .id(member.getId())
+                                .build();
+                        })
                         .collect(Collectors.toList()))
                 .build();
     }
